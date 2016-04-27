@@ -3,7 +3,8 @@ import React, {
   Component,
   Navigator,
   View,
-  Text
+  Text,
+  TouchableOpacity
 } from 'react-native';
 
 class MyScene extends Component {
@@ -13,7 +14,7 @@ class MyScene extends Component {
   render(){
   	return(
       <View style={{paddingTop: 60}}>
-        <Text>Scene</Text>
+        <Text>{this.props.title}</Text>
       </View>
     );
   }
@@ -21,8 +22,13 @@ class MyScene extends Component {
 
 var NavigationBarRouteMapper = {
   LeftButton: function( route, navigator, index, navState ){
+    if(index === 0){
+      return null;
+    }
     return(
-      <Text></Text>
+      <TouchableOpacity onPress={() => {navigator.pop()}}>
+      <Text>Back</Text>
+      </TouchableOpacity>
     )
   },
   Title: function( route, navigator, index, navState ){
@@ -32,7 +38,9 @@ var NavigationBarRouteMapper = {
   },
   RightButton: function( route, navigator, index, navState ){
     return(
+      <TouchableOpacity onPress={() => {navigator.push({id: 'second', name: 'My Second Scene'})}}>
       <Text>Next</Text>
+      </TouchableOpacity>
     )
   },
 };
@@ -41,13 +49,21 @@ class SampleApp extends Component {
   constructor(props: any) {
     super(props);
   }
+  navRender(route, navigator) {
+    switch (route.id) {
+      case 'first':
+        return <MyScene navigator={navigator} title={ "MyScene 1" } rightButton={"Next"} />;
+      case 'second':
+        return <MyScene navigator={navigator} title={ "MyScene 2" } rightButton={"Next"} />;
+      default:
+        break;
+    }
+  }
   render(){
     return (
 			<Navigator
-        initialRoute={{name: 'My First Scene', index: 0}}
-        renderScene={(route, navigator) =>
-          <MyScene navigator={navigator} title={ "MyScene 1" } rightButton={"Next"} />
-        }
+        initialRoute={{id: 'first', name: 'My First Scene'}}
+        renderScene={this.navRender}
         navigationBar={
           <Navigator.NavigationBar
             routeMapper={NavigationBarRouteMapper}
